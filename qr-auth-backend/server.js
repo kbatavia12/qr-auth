@@ -18,7 +18,7 @@ mongoose.connect(process.env.DB_URI, {
 
 const PORT = 1192;
 var server = app.listen(PORT, function(){
-    console.log('listening for requests on port 4000,');
+    console.log('listening for requests on port 1192,');
 });
 
 // Static files
@@ -29,27 +29,36 @@ var io = socket(server, {
     cors: '*'
 });
 
+
+
 let socketId = null;
 
 io.on('connection', (socket) => {
     console.log(socket.id);
     socketId = socket.id;
-
     
-
+    
     socket.on('get-cookie', fn => fn(`qrauthsystem://${socket.id}`));
+    socket.on('authenticate-user', (data, callback) => {
+
+        console.log(data.data.substring(15,));
+        socket.to(data.data.substring(15,)).emit('userlogin', data);
+
+    })
+
+    socket.emit('hello', "Welcome!");
+
+
+    socket.on('conn-req', (data, fn) => {
+        fn('hello');
+    });
+
 
     socket.on('disconnect', (reason) => {
         console.log(reason);
     })
 });
 
-io.on('get-token', socket => {
-   
-    console.log('Hello')
-    socket.on('get-token', fn => fn('1234'));
-    
-});
 
 
 app.get('/', (req, res) => {

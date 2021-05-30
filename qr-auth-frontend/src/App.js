@@ -4,7 +4,7 @@ import styles from './App.module.css'
 import socketIOClient from 'socket.io-client'
 
 
-const socket = socketIOClient('http://127.0.0.1:1192');
+const socket = socketIOClient('http://192.168.1.2:1192');
 function App() {
 
 	const [QRData, setQRData] = useState('');
@@ -13,11 +13,14 @@ function App() {
 	useEffect(() => {
 		socket.emit('get-cookie', async data => {
 			const token = await data;
-			console.log(token);
 			setQRData(token);
 			setDisplayQrCode(true);
 		});
 
+		socket.emit('get-token', async data => {
+			const token = await data;
+			console.log(token);
+		})
 		return () => {
 			socket.disconnect();
 		}
@@ -25,20 +28,15 @@ function App() {
 
 
 	useEffect(() => {
-		socket.emit('get-token', async data => {
-			const token = await data;
-			console.log(token);
-		})
-
-		const interval = setInterval(() => {
-			console.log('Hello')
-			
-		}, 1000)
+		socket.on('userlogin', async data => {
+			const res = await data;
+			console.log(res);
+		}) 	
+	}, [])
 
 
-		return () => {
-			clearInterval(interval);
-		}
+	useEffect(() => {
+		
 	}, [])
 
 	return (
